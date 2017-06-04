@@ -1,19 +1,3 @@
-const h = (type, props = {}, children = []) => ({
-  type,
-  props,
-  children
-});
-
-const WelcomeComponent = ({ name }) => h('div', {}, [`Welcome ${name}!`]);
-
-const RootComponent = ({ user }) => {
-  if (user) {
-    return h('div', {}, [`Welcome ${user.name}!`]);
-  } else {
-    return h('div', {}, ['Please, Log in.']);
-  }
-};
-
 const createVDOM = (element, id = '.') => {
   const newElement = {
     type: element.type,
@@ -33,29 +17,10 @@ const createVDOM = (element, id = '.') => {
   }
   if (typeof element.type === 'function') {
     const subtree = newElement.type(element.props);
-    if (subtree.memoized) {
-      return subtree;
-    } else {
-      return createVDOM(subtree, id);
-    }
+    return createVDOM(subtree, id);
   } else {
     return newElement;
   }
-};
-
-const memoize = component => {
-  let lastProps = null;
-  let lastResult = null;
-  return props => {
-    if (!shallowEqual(props, lastProps)) {
-      lastResult = component(props);
-      lastProps = props;
-      lastResult.memoized = true;
-    } else {
-      lastResult.memoized = false;
-    }
-    return lastResult;
-  };
 };
 
 const diff = (left, right, patches, parent = null) => {
@@ -76,18 +41,14 @@ const diff = (left, right, patches, parent = null) => {
       replacingNode: left,
       node: right
     });
-  } else if (right.memoized) {
-    return;
   } else {
-    if (typeof left === 'string' || typeof right === 'string') {
-      const children = left.children.length >= right.children.length ? left.children : right.children;
-      children.forEach((child, index) => diff(
-        left.children[index],
-        right.children[index],
-        patches,
-        left
-      ))
-    }
+    const children = left.children.length >= right.children.length ? left.children : right.children;
+    children.forEach((child, index) => diff(
+      left.children[index],
+      right.children[index],
+      patches,
+      left
+    ))
   }
 };
 
@@ -148,11 +109,3 @@ const createRender = domElement => {
 };
 
 const render = createRender(document.getElementById('app'));
-
-let loggedIn = false;
-setInterval(() => {
-  loggedIn = !loggedIn;
-  render(h(RootComponent, {
-    user: loggedIn ? { name: 'Garima' } : null
-  }))
-}, 1000);
