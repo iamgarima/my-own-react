@@ -9,7 +9,3 @@ const reducer = (state = initialState, action) => {
       return state;    
   }
 };
-
-//console.log(reducer([], { type: ADD_NOTE, note: "Complete the current project" }));
-
-module.exports = reducer;

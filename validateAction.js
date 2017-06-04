@@ -5,8 +5,4 @@ const validateAction = action => {
   if (typeof action.type === 'undefined') {
     throw new Error('Action must have a type!');
   }
-}
-
-console.log(validateAction());
-
-module.exports = validateAction;
+};
